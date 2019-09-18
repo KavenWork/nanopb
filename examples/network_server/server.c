@@ -94,13 +94,11 @@ void handle_connection(int connfd)
             perror("opendir");
             
             /* Directory was not found, transmit error status */
-            response.has_path_error = true;
             response.path_error = true;
         }
         else
         {
             /* Directory was found, transmit filenames */
-            response.has_path_error = false;
             response.file = directory;
         }
         

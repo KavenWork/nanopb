@@ -58,11 +58,11 @@ bool listdir(int fd, char *path)
          * the server will list the root directory. */
         if (path == NULL)
         {
-            request.has_path = false;
+            /* Default path */
+            path = "/";
         }
-        else
+        
         {
-            request.has_path = true;
             if (strlen(path) + 1 > sizeof(request.path))
             {
                 fprintf(stderr, "Too long path.\n");

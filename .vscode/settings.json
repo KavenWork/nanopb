@@ -1,5 +1,8 @@
 {
     "files.associations": {
-        "typeinfo": "c"
+        "typeinfo": "c",
+        "common.h": "c",
+        "fileproto.pb.h": "c",
+        "pb.h": "c"
     }
 }

@@ -21,20 +21,29 @@ message ListFilesResponse {
 enum MessageType {
     NONE = 0;
 
-    MESSAGE_GET_FILES = 1;
-    MESSAGE_GET_FILES_OK = 2;
+    GET_FILES = 1;
+    GET_FILES_OK = 2;
 
-    MESSAGE_DIGITAL_WRITE_HIGH = 101;
-    MESSAGE_DIGITAL_WRITE_HIGH_OK = 102;
+    DIGITAL_WRITE_HIGH = 101;
+    DIGITAL_WRITE_HIGH_OK = 102;
 
-    MESSAGE_DIGITAL_WRITE_LOW = 103;
-    MESSAGE_DIGITAL_WRITE_LOW_OK = 104;
+    DIGITAL_WRITE_LOW = 103;
+    DIGITAL_WRITE_LOW_OK = 104;
 }
 
 message Message {
     MessageType Type = 1;
-    
-    int32 P1 = 2;
-    int32 P2 = 3;
-    bool P3 = 4;
+    bytes Data = 2;
+
+    string P1 = 3;
+    string P2 = 4;
+
+    int32 P3 = 5;
+    int32 P4 = 6;
+
+    int64 P5 = 7;
+    int64 P6 = 8;
+
+    bool P7 = 9;
+    bool P8 = 10;
 }

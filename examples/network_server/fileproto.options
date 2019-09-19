@@ -12,3 +12,6 @@
 ListFilesResponse.file  type:FT_CALLBACK, callback_datatype:"void*"
 ListFilesRequest.path 	max_size:128
 FileInfo.name 		max_size:128
+Message.Data      max_size:10240
+Message.P1      max_size:128
+Message.P2      max_size:128

@@ -3,6 +3,7 @@
         "typeinfo": "c",
         "common.h": "c",
         "fileproto.pb.h": "c",
-        "pb.h": "c"
+        "pb.h": "c",
+        "api.h": "c"
     }
 }

@@ -21,6 +21,7 @@
 #include <pb_decode.h>
 
 #include "common.h"
+#include "api.h"
 
 /* This callback function will be called during the encoding.
  * It will write out any number of FileInfo entries, without consuming unnecessary memory.
@@ -141,6 +142,13 @@ void handle_connection(int connfd)
     {
     case MessageType_GET_FILES:
         handle_getFiles(connfd, msg.P1);
+        break;
+
+    case MessageType_DIGITAL_WRITE_HIGH:
+        api_digital_write_high(msg.P3);
+        break;
+
+    case MessageType_DIGITAL_WRITE_LOW:
         break;
 
     default:

@@ -7,8 +7,6 @@
 pb_ostream_t pb_ostream_from_socket(int fd);
 pb_istream_t pb_istream_from_socket(int fd);
 
-pb_ostream_t pb_ostream_from_buffer(pb_byte_t* buffer, size_t size);
-
 const char *getMessageTypeName(MessageType type);
 
 const int PORT;

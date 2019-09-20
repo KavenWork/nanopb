@@ -84,21 +84,42 @@ bool listdir(int fd, char *path)
 
     /* Read back the response from server */
     {
-        ListFilesResponse response = {};
+        Message msg = {};
         pb_istream_t input = pb_istream_from_socket(fd);
 
-        if (!pb_decode_delimited(&input, ListFilesResponse_fields, &response))
+        if (!pb_decode_delimited(&input, Message_fields, &msg))
         {
-            fprintf(stderr, "Decode failed: %s\n", PB_GET_ERROR(&input));
+            printf("Decode failed: %s\n", PB_GET_ERROR(&input));
             return false;
         }
 
-        /* If the message from server decodes properly, but directory was
-         * not found on server side, we get path_error == true. */
-        if (response.path_error)
+        printf("Message received: %s\n", getMessageTypeName(msg.Type));
+
+        switch (msg.Type)
         {
-            fprintf(stderr, "Server reported error.\n");
-            return false;
+        case MessageType_GET_FILES_OK:
+        {
+            ListFilesResponse response = {};
+            pb_istream_t input = pb_istream_from_buffer(msg.Data.bytes, msg.Data.size);
+
+            if (!pb_decode(&input, ListFilesResponse_fields, &response))
+            {
+                fprintf(stderr, "Decode failed: %s\n", PB_GET_ERROR(&input));
+                return false;
+            }
+
+            /* If the message from server decodes properly, but directory was
+         * not found on server side, we get path_error == true. */
+            if (response.path_error)
+            {
+                fprintf(stderr, "Server reported error.\n");
+                return false;
+            }
+        }
+        break;
+
+        default:
+            break;
         }
     }
 

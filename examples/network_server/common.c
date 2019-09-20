@@ -10,13 +10,13 @@
 
 const int PORT = 12345;
 
-static bool write_callback(pb_ostream_t *stream, const uint8_t *buf, size_t count)
+static bool socket_write_callback(pb_ostream_t *stream, const uint8_t *buf, size_t count)
 {
     int fd = (intptr_t)stream->state;
     return send(fd, buf, count, 0) == count;
 }
 
-static bool read_callback(pb_istream_t *stream, uint8_t *buf, size_t count)
+static bool socket_read_callback(pb_istream_t *stream, uint8_t *buf, size_t count)
 {
     int fd = (intptr_t)stream->state;
     int result;
@@ -32,17 +32,40 @@ static bool read_callback(pb_istream_t *stream, uint8_t *buf, size_t count)
     return result == count;
 }
 
+/*
+static bool buffer_write_callback(pb_ostream_t *stream, const uint8_t *buf, size_t count)
+{
+    if (stream->bytes_written + count > stream->max_size)
+    {
+        return false;
+    }
+
+    pb_byte_t* buffer = (pb_byte_t*)(stream->state + stream->bytes_written);
+    memcpy(buffer, buf, count);
+    stream->bytes_written += count;
+    return true;
+}
+*/
+
 pb_ostream_t pb_ostream_from_socket(int fd)
 {
-    pb_ostream_t stream = {&write_callback, (void*)(intptr_t)fd, SIZE_MAX, 0};
+    pb_ostream_t stream = {&socket_write_callback, (void*)(intptr_t)fd, SIZE_MAX, 0};
     return stream;
 }
 
 pb_istream_t pb_istream_from_socket(int fd)
 {
-    pb_istream_t stream = {&read_callback, (void*)(intptr_t)fd, SIZE_MAX};
+    pb_istream_t stream = {&socket_read_callback, (void*)(intptr_t)fd, SIZE_MAX};
     return stream;
 }
+
+/*
+pb_ostream_t pb_ostream_from_buffer(pb_byte_t* buffer, size_t size)
+{
+    pb_ostream_t stream = {&buffer_write_callback, (void*)buffer, size, 0};    
+    return stream;
+}
+*/
 
 const char *getMessageTypeName(MessageType type)
 {

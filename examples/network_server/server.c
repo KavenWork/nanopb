@@ -72,7 +72,6 @@ void handle_getFiles(int connfd, const char *path)
     /* List the files in the directory and transmit the response to client */
     {
         ListFilesResponse response = {};
-        pb_ostream_t output = pb_ostream_from_socket(connfd);
 
         if (directory == NULL)
         {
@@ -87,9 +86,31 @@ void handle_getFiles(int connfd, const char *path)
             response.file = directory;
         }
 
-        if (!pb_encode_delimited(&output, ListFilesResponse_fields, &response))
+        size_t size;
+        pb_get_encoded_size(&size, ListFilesResponse_fields, &response);
+
+        pb_byte_t buffer[size];
+        pb_ostream_t output = pb_ostream_from_buffer(buffer, sizeof(buffer));
+
+        if (!pb_encode(&output, ListFilesResponse_fields, &response))
         {
             printf("Encoding failed: %s\n", PB_GET_ERROR(&output));
+        }
+        else
+        {
+            Message msg = {};
+
+            msg.Type = MessageType_GET_FILES_OK;
+            strcpy(msg.P1, path);
+            msg.Data.size = size;
+            memcpy(msg.Data.bytes, buffer, size);
+
+            pb_ostream_t socket_output = pb_ostream_from_socket(connfd);
+
+            if (!pb_encode_delimited(&socket_output, Message_fields, &msg))
+            {
+                printf("Encoding failed: %s\n", PB_GET_ERROR(&output));
+            }
         }
     }
 
@@ -105,21 +126,21 @@ void handle_connection(int connfd)
 {
     /* Decode the message from the client and open the requested directory. */
 
-    Message request = {};
+    Message msg = {};
     pb_istream_t input = pb_istream_from_socket(connfd);
 
-    if (!pb_decode_delimited(&input, Message_fields, &request))
+    if (!pb_decode_delimited(&input, Message_fields, &msg))
     {
         printf("Decode failed: %s\n", PB_GET_ERROR(&input));
         return;
     }
 
-    printf("Message received: %s\n", getMessageTypeName(request.Type));
+    printf("Message received: %s\n", getMessageTypeName(msg.Type));
 
-    switch (request.Type)
+    switch (msg.Type)
     {
     case MessageType_GET_FILES:
-        handle_getFiles(connfd, request.P1);
+        handle_getFiles(connfd, msg.P1);
         break;
 
     default:
